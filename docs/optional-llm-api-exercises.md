@@ -28,10 +28,10 @@ Bạn sẽ thấy output so sánh phản hồi của `gpt-6.1-terra` và `gpt-6-
 Gọi `call_openai` với các giá trị temperature 0.0, 0.5, 1.0 và 1.5 sử dụng prompt **"Hãy kể cho tôi một sự thật thú vị về Việt Nam."** (nhớ gửi `reasoning_effort="none"`: model GPT-6 chỉ nhận `temperature` khi tắt suy luận)
 
 **Bạn nhận thấy quy luật gì qua bốn phản hồi?** (2–3 câu)
-> *Câu trả lời của bạn*
+> Ở `temperature = 0.0`, mô hình luôn trả về cùng một sự thật quen thuộc (ví dụ về hang Sơn Đoòng hoặc sản lượng cà phê) với cách diễn đạt chuẩn mực và lặp lại gần như y hệt giữa các lần gọi. Khi tăng dần lên `0.5` và `1.0`, câu trả lời đa dạng hơn về chủ đề và cách dùng từ sinh động hơn nhưng vẫn mạch lạc. Đến `1.5`, câu chữ trở nên phóng khoáng, đôi khi lan man hoặc pha trộn chi tiết kém chính xác hơn do xác suất chọn các token ít phổ biến tăng cao.
 
 **Bạn sẽ đặt temperature bao nhiêu cho chatbot hỗ trợ khách hàng, và tại sao?**
-> *Câu trả lời của bạn*
+> Tôi sẽ đặt `temperature` thấp trong khoảng **0.0 – 0.2** (ưu tiên `0.0` hoặc `0.1`). Chatbot hỗ trợ khách hàng cần cung cấp thông tin chính sách, giá cả, quy trình đổi trả một cách **nhất quán, chính xác và bám sát tài liệu**, tránh việc tự suy diễn hoặc bịa thêm thông tin sai lệch (hallucination).
 
 ---
 
@@ -39,26 +39,27 @@ Gọi `call_openai` với các giá trị temperature 0.0, 0.5, 1.0 và 1.5 sử
 Xem xét kịch bản: 10.000 người dùng hoạt động mỗi ngày, mỗi người thực hiện 3 lần gọi API, mỗi lần trung bình ~350 token.
 
 **Ước tính xem `gpt-6.1-terra` đắt hơn `gpt-6-luna` bao nhiêu lần cho workload này** (giá 11/2026: terra $1.00 / $5.00, luna $0.10 / $0.50 mỗi 1M token input / output):
-> *Câu trả lời của bạn*
+> Tổng khối lượng mỗi ngày là $10.000 \times 3 \times 350 = 10.500.000$ token (10,5M token/ngày). Vì đơn giá của `gpt-6.1-terra` (1,00 USD / 1M input và 5,00 USD / 1M output) cao gấp đúng **10 lần** `gpt-6-luna` (0,10 USD / 1M input và 0,50 USD / 1M output) ở cả chiều input lẫn output, nên bất kể tỷ lệ chia input/output trong 350 token là bao nhiêu, `gpt-6.1-terra` luôn đắt gấp **10 lần** `gpt-6-luna` (ví dụ nếu 250 input + 100 output mỗi lần gọi: `luna` tốn 0,75 USD + 1,50 USD = **2,25 USD/ngày**, còn `terra` tốn 7,50 USD + 15,00 USD = **22,50 USD/ngày**).
 
 **Mô tả một trường hợp mà chi phí cao hơn của `gpt-6.1-terra` là xứng đáng, và một trường hợp `gpt-6-luna` là lựa chọn tốt hơn:**
-> *Câu trả lời của bạn*
+> - **Khi `gpt-6.1-terra` xứng đáng:** Phân tích hợp đồng pháp lý phức tạp, chẩn đoán lỗi kiến trúc phần mềm nhiều file, hoặc xử lý khiếu nại tài chính nhạy cảm — nơi một sai sót suy luận gây thiệt hại lớn hơn nhiều so với vài USD tiền API.
+> - **Khi `gpt-6-luna` tốt hơn:** Phân loại nhãn hàng loạt (như lọc SMS spam/ham, gắn tag ticket hỗ trợ), tóm tắt ngắn hoặc trích xuất trường dữ liệu đơn giản ở quy mô hàng triệu lượt gọi/ngày cần độ trễ thấp và chi phí tối ưu.
 
 ---
 
 ### Bài tập 2.3 — Trải Nghiệm Người Dùng với Streaming
 **Streaming quan trọng nhất trong trường hợp nào, và khi nào thì non-streaming lại phù hợp hơn?** (1 đoạn văn)
-> *Câu trả lời của bạn*
+> **Streaming** quan trọng nhất trong các giao diện tương tác trực tiếp với con người (chatbot, trợ lý viết lách, giải thích code dài) vì người dùng nhìn thấy chữ đầu tiên hiện ra chỉ sau vài trăm mili-giây (*Time To First Token* thấp), tạo cảm giác phản hồi tức thì thay vì phải nhìn màn hình chờ 5–10 giây cho đến khi toàn bộ câu trả lời sinh xong. Ngược lại, **non-streaming** phù hợp hơn cho các tác vụ xử lý ngầm hoặc pipeline tự động giữa máy với máy (như phân loại `spam`/`ham` bằng 1 từ, trích xuất JSON có cấu trúc để parse ngay, gọi hàm batch job), nơi chương trình phía sau cần nhận trọn vẹn chuỗi kết quả hợp lệ một lần để kiểm tra và xử lý tiếp mà không cần hiển thị từng mảnh token trung gian.
 
 
 ## Danh Sách Kiểm Tra Nộp Bài
-- [ ] Tất cả tests pass: `pytest tests/test_solution.py -v`
-- [ ] `call_openai` đã triển khai và kiểm thử
-- [ ] `call_openai_mini` đã triển khai và kiểm thử
-- [ ] `compare_models` đã triển khai và kiểm thử
-- [ ] `streaming_chatbot` đã triển khai và kiểm thử
-- [ ] `retry_with_backoff` đã triển khai và kiểm thử
-- [ ] `batch_compare` đã triển khai và kiểm thử
-- [ ] `format_comparison_table` đã triển khai và kiểm thử
-- [ ] `exercises.md` đã điền đầy đủ
-- [ ] Sao chép bài làm vào folder `solution` và đặt tên theo quy định 
+- [x] Tất cả tests pass: `pytest tests/test_solution.py -v`
+- [x] `call_openai` đã triển khai và kiểm thử
+- [x] `call_openai_mini` đã triển khai và kiểm thử
+- [x] `compare_models` đã triển khai và kiểm thử
+- [x] `streaming_chatbot` đã triển khai và kiểm thử
+- [x] `retry_with_backoff` đã triển khai và kiểm thử
+- [x] `batch_compare` đã triển khai và kiểm thử
+- [x] `format_comparison_table` đã triển khai và kiểm thử
+- [x] `exercises.md` đã điền đầy đủ
+- [x] Sao chép bài làm vào folder `solution` và đặt tên theo quy định 
